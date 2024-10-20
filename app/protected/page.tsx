@@ -9,7 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { SubmitButton } from "@/components/submit-button";
 import { useState } from "react";
-import { callOpenAIAction } from "../actions";
+import { callOpenAIAction } from "@/app/actions";
 
 export default function ProtectedPage() {  // Remove "async" since Client Components don't support async
   const [loading, setLoading] = useState(false);
