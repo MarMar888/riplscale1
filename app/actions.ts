@@ -131,47 +131,52 @@ export const signOutAction = async () => {
 };
 
 
-export const callOpenAIAction = async (formData) => {
+export const callOpenAIAction = async (formData: FormData) => {
   // Access the specific fields from the formData object
-  const className = formData.get("ClassName"); // Ensure this matches the name used in your form
-  const gradeLevel = formData.get("GradeLevel");
-  const clos = formData.get("clos");
+  const className = formData.get("ClassName")?.toString() || ''; // Ensure this matches the name used in your form
+  const gradeLevel = formData.get("GradeLevel")?.toString() || '';
+  const clos = formData.get("clos")?.toString() || '';
 
-  // Create the OpenAI API request configuration
-  const prompt = `Class Name: ${className}, Grade Level: ${gradeLevel}, Objective: ${clos}`;
+  // Create an array of prompts (for example, 20 variations)
+  const prompts = Array.from({ length: 20 }, (_, index) =>
+    `Request ${index + 1}: Class Name: ${className}, Grade Level: ${gradeLevel}, Objective: ${clos}`
+  );
 
-  const completionConfig = {
-    model: 'gpt-4',
-    prompt: prompt, // Use the constructed prompt from the form data
-    max_tokens: 256,
-    temperature: 0,
-    stream: false,
-  };
+  const responses: string[] = []; // Define responses as an array of strings
 
   try {
-    const response = await fetch('https://api.openai.com/v1/completions', {
-      method: 'POST',
-      headers: {
-        Authorization: `Bearer ${process.env.OPENAI_API_KEY}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(completionConfig),
-    });
-
-    const result = await response.json();
-
-    if (response.ok) {
-      return {
-        success: true,
-        data: result.choices?.[0]?.text ?? "No response",
+    for (const prompt of prompts) {
+      const completionConfig = {
+        model: 'gpt-4',
+        prompt: prompt,
+        max_tokens: 256,
+        temperature: 0,
+        stream: false,
       };
-    } else {
-      console.error("Error calling OpenAI API", result);
-      return {
-        success: false,
-        error: result.message || "OpenAI error occurred.",
-      };
+
+      const response = await fetch('https://api.openai.com/v1/completions', {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${process.env.OPENAI_API_KEY}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(completionConfig),
+      });
+
+      const result = await response.json();
+
+      if (response.ok) {
+        responses.push(result.choices?.[0]?.text ?? "No response");
+      } else {
+        console.error("Error calling OpenAI API", result);
+        responses.push(`Error: ${result.message || "OpenAI error occurred."}`);
+      }
     }
+
+    return {
+      success: true,
+      data: responses, // Return the array of responses
+    };
   } catch (error) {
     console.error("Error calling OpenAI API:", error);
     return {
