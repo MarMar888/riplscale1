@@ -4,6 +4,8 @@ import { encodedRedirect } from "@/utils/utils";
 import { createClient } from "@/utils/supabase/server";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
+import 'https://deno.land/x/xhr@0.3.0/mod.ts';
+import { CreateCompletionRequest } from 'https://esm.sh/openai@3.1.0';
 
 export const signUpAction = async (formData: FormData) => {
   const email = formData.get("email")?.toString();
@@ -129,4 +131,77 @@ export const signOutAction = async () => {
   return redirect("/sign-in");
 };
 
+
+export const signUpAction = async (formData: FormData) => {
+  const email = formData.get("email")?.toString();
+  const password = formData.get("password")?.toString();
+  const supabase = createClient();
+  const origin = headers().get("origin");
+
+  if (!email || !password) {
+    return { error: "Email and password are required" };
+  }
+
+  const { error } = await supabase.auth.signUp({
+    email,
+    password,
+    options: {
+      emailRedirectTo: `${origin}/auth/callback`,
+    },
+  });
+
+  if (error) {
+    console.error(error.code + " " + error.message);
+    return encodedRedirect("error", "/sign-up", error.message);
+  } else {
+    return encodedRedirect(
+      "success",
+      "/sign-up",
+      "Thanks for signing up! Please check your email for a verification link.",
+    );
+  }
+};
+
+// NEW FUNCTION: Call OpenAI API
+export const callOpenAIAction = async (formData: FormData) => {
+  const query = formData.get("query")?.toString();
+
+  if (!query) {
+    return encodedRedirect("error", "/openai", "Query is required.");
+  }
+
+  try {
+    const completionConfig: CreateCompletionRequest = {
+      model: 'text-davinci-003',
+      prompt: query,
+      max_tokens: 256,
+      temperature: 0,
+      stream: false, // stream can be true if you want streamed responses
+    };
+
+    const response = await fetch('https://api.openai.com/v1/completions', {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${process.env.OPENAI_API_KEY}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(completionConfig),
+    });
+
+    const result = await response.json();
+
+    if (response.ok) {
+      return {
+        success: true,
+        data: result.choices?.[0]?.text ?? "No response",
+      };
+    } else {
+      console.error("Error calling OpenAI API", result);
+      return encodedRedirect("error", "/openai", result.message || "OpenAI error occurred.");
+    }
+  } catch (error) {
+    console.error("Error calling OpenAI API:", error);
+    return encodedRedirect("error", "/openai", "An error occurred while calling OpenAI.");
+  }
+};
 
