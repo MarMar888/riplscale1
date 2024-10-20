@@ -54,7 +54,7 @@ export default function ProtectedPage() {  // Remove "async" since Client Compon
           <Label htmlFor="clos">Current Learning Objectives / Mastery Target</Label>
           <Input name="clos" placeholder="Chi Squared Test" required />
 
-          <SubmitButton pendingText="Creating Projects" isPending={loading}>
+          <SubmitButton pendingText="Creating Projects">
             Create Projects
           </SubmitButton>
         </form>
