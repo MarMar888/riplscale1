@@ -13,7 +13,7 @@ import { callOpenAIAction } from "@/app/actions";
 
 export default function ProtectedPage() {
   const [loading, setLoading] = useState(false);
-  const [openAiResponse, setOpenAiResponse] = useState(null);
+  const [openAiResponse, setOpenAiResponse] = useState<string | null>(null); // Update type to string | null
 
   // Form submission handler
   const handleSubmit = async (e: React.FormEvent) => {
@@ -23,16 +23,23 @@ export default function ProtectedPage() {
     const formData = new FormData(e.target as HTMLFormElement);
 
     try {
-      // Call your action directly with formData
-      const result = await callOpenAIAction(formData);
+      const response = await fetch("/api/openai", {
+        method: "POST",
+        body: formData,
+      });
+
+      const result = await response.json();
 
       if (result.success) {
-        setOpenAiResponse(result.data);
+        // Set openAiResponse only if data is defined
+        setOpenAiResponse(result.data || "No response"); // Fallback to a default message
       } else {
         console.error(result.error);
+        setOpenAiResponse(null); // Optionally clear the response on error
       }
     } catch (error) {
       console.error("Error submitting form:", error);
+      setOpenAiResponse(null); // Clear response on error
     } finally {
       setLoading(false);
     }
