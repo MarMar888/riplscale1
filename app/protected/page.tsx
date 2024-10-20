@@ -58,7 +58,7 @@ export default function ProtectedPage() {
           <Label htmlFor="clos">Current Learning Objectives / Mastery Target</Label>
           <Input name="clos" placeholder="Chi Squared Test" required />
 
-          <SubmitButton pendingText="Creating Projects" isPending={loading}>
+          <SubmitButton pendingText="Creating Projects" formAction={callOpenAIAction}>
             Create Projects
           </SubmitButton>
         </form>
