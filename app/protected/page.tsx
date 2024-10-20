@@ -2,6 +2,11 @@ import FetchDataSteps from "@/components/tutorial/fetch-data-steps";
 import { createClient } from "@/utils/supabase/server";
 import { InfoIcon } from "lucide-react";
 import { redirect } from "next/navigation";
+import { Badge } from "./ui/badge";
+import { Button } from "./ui/button";
+import Link from "next/link";
+import { Input, InputProps } from "./Input"; 
+
 
 export default async function ProtectedPage() {
   const supabase = createClient();
@@ -14,9 +19,25 @@ export default async function ProtectedPage() {
     return redirect("/sign-in");
   }
 
+
   return (
     <div className="flex-1 w-full flex flex-col gap-12">
       <div className="w-full">
+
+        <Input name="ClassName" placeholder="AP Statistics" required />
+        <Input name="GradeLevel" placeholder="12th Grade" required />
+        <Input name="clos" placeholder="Chi Squared Test" required />
+        <Button
+          asChild
+          size="sm"
+          variant={"outline"}
+          disabled
+          className="opacity-75 cursor-none pointer-events-none"
+        >
+        <Link href="/sign-in">Create Projects</Link>
+        </Button>
+
+
         <div className="bg-accent text-sm p-3 px-5 rounded-md text-foreground flex gap-3 items-center">
           <InfoIcon size="16" strokeWidth={2} />
           This is a protected page that you can only see as an authenticated
