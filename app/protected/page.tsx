@@ -2,10 +2,10 @@ import FetchDataSteps from "@/components/tutorial/fetch-data-steps";
 import { createClient } from "@/utils/supabase/server";
 import { InfoIcon } from "lucide-react";
 import { redirect } from "next/navigation";
-import { Badge } from "./ui/badge";
-import { Button } from "./ui/button";
 import Link from "next/link";
-import { Input, InputProps } from "./Input"; 
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { SubmitButton } from "@/components/submit-button";
 
 
 export default async function ProtectedPage() {
@@ -27,15 +27,11 @@ export default async function ProtectedPage() {
         <Input name="ClassName" placeholder="AP Statistics" required />
         <Input name="GradeLevel" placeholder="12th Grade" required />
         <Input name="clos" placeholder="Chi Squared Test" required />
-        <Button
-          asChild
-          size="sm"
-          variant={"outline"}
-          disabled
-          className="opacity-75 cursor-none pointer-events-none"
+        <SubmitButton pendingText="Creating Projects" 
+        // formAction={}
         >
-        <Link href="/sign-in">Create Projects</Link>
-        </Button>
+          Create Projects
+        </SubmitButton>
 
 
         <div className="bg-accent text-sm p-3 px-5 rounded-md text-foreground flex gap-3 items-center">
