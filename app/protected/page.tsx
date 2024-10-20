@@ -1,4 +1,4 @@
-"use client";  // <-- Add this line
+"use client";  // <-- Keep this line
 
 import FetchDataSteps from "@/components/tutorial/fetch-data-steps";
 import { createClient } from "@/utils/supabase/server";
@@ -11,7 +11,7 @@ import { SubmitButton } from "@/components/submit-button";
 import { useState } from "react";
 import { callOpenAIAction } from "@/app/actions";
 
-export default function ProtectedPage() {  // Remove "async" since Client Components don't support async
+export default function ProtectedPage() {
   const [loading, setLoading] = useState(false);
   const [openAiResponse, setOpenAiResponse] = useState(null);
 
@@ -23,14 +23,10 @@ export default function ProtectedPage() {  // Remove "async" since Client Compon
     const formData = new FormData(e.target as HTMLFormElement);
 
     try {
-      const response = await fetch("/api/openai", {
-        method: "POST",
-        body: formData,
-      });
+      // Call your action directly with formData
+      const result = await callOpenAIAction(formData);
 
-      const result = await response.json();
-
-      if (response.ok) {
+      if (result.success) {
         setOpenAiResponse(result.data);
       } else {
         console.error(result.error);
@@ -55,7 +51,7 @@ export default function ProtectedPage() {  // Remove "async" since Client Compon
           <Label htmlFor="clos">Current Learning Objectives / Mastery Target</Label>
           <Input name="clos" placeholder="Chi Squared Test" required />
 
-          <SubmitButton pendingText="Creating Projects" formAction={callOpenAIAction}>
+          <SubmitButton pendingText="Creating Projects" isPending={loading}>
             Create Projects
           </SubmitButton>
         </form>

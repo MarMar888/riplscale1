@@ -131,22 +131,24 @@ export const signOutAction = async () => {
 };
 
 
-export const callOpenAIAction = async (formData: FormData) => {
-  const query = formData.get("query")?.toString();
+export const callOpenAIAction = async (formData) => {
+  // Access the specific fields from the formData object
+  const className = formData.get("ClassName"); // Ensure this matches the name used in your form
+  const gradeLevel = formData.get("GradeLevel");
+  const clos = formData.get("clos");
 
-  if (!query) {
-    return encodedRedirect("error", "/openai", "Query is required.");
-  }
+  // Create the OpenAI API request configuration
+  const prompt = `Class Name: ${className}, Grade Level: ${gradeLevel}, Objective: ${clos}`;
+
+  const completionConfig = {
+    model: 'gpt-4',
+    prompt: prompt, // Use the constructed prompt from the form data
+    max_tokens: 256,
+    temperature: 0,
+    stream: false,
+  };
 
   try {
-    const completionConfig = {
-      model: 'gpt-4',
-      prompt: query,
-      max_tokens: 256,
-      temperature: 0,
-      stream: false,
-    };
-
     const response = await fetch('https://api.openai.com/v1/completions', {
       method: 'POST',
       headers: {
@@ -165,11 +167,18 @@ export const callOpenAIAction = async (formData: FormData) => {
       };
     } else {
       console.error("Error calling OpenAI API", result);
-      return encodedRedirect("error", "/openai", result.message || "OpenAI error occurred.");
+      return {
+        success: false,
+        error: result.message || "OpenAI error occurred.",
+      };
     }
   } catch (error) {
     console.error("Error calling OpenAI API:", error);
-    return encodedRedirect("error", "/openai", "An error occurred while calling OpenAI.");
+    return {
+      success: false,
+      error: "An error occurred while calling OpenAI.",
+    };
   }
 };
+
 
