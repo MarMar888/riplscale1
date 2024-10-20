@@ -9,6 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { SubmitButton } from "@/components/submit-button";
 import { useState } from "react";
+import { callOpenAIAction } from "../actions";
 
 export default function ProtectedPage() {  // Remove "async" since Client Components don't support async
   const [loading, setLoading] = useState(false);
@@ -43,7 +44,7 @@ export default function ProtectedPage() {  // Remove "async" since Client Compon
 
   return (
     <div className="flex-1 w-full flex flex-col gap-12">
-      <div className="w-full gap-12">
+      <div className="w-full gap-12 py-8">
         <form onSubmit={handleSubmit}>
           <Label htmlFor="ClassName">Class Name</Label>
           <Input name="ClassName" placeholder="AP Statistics" required />
@@ -54,7 +55,7 @@ export default function ProtectedPage() {  // Remove "async" since Client Compon
           <Label htmlFor="clos">Current Learning Objectives / Mastery Target</Label>
           <Input name="clos" placeholder="Chi Squared Test" required />
 
-          <SubmitButton pendingText="Creating Projects">
+          <SubmitButton pendingText="Creating Projects" formAction={callOpenAIAction}>
             Create Projects
           </SubmitButton>
         </form>
