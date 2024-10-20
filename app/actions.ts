@@ -172,7 +172,7 @@ export const callOpenAIAction = async (formData: FormData) => {
 
   try {
     const completionConfig: CreateCompletionRequest = {
-      model: 'text-davinci-003',
+      model: 'gpt-4',
       prompt: query,
       max_tokens: 256,
       temperature: 0,
