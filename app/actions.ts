@@ -132,7 +132,6 @@ export const signOutAction = async () => {
 };
 
 
-// NEW FUNCTION: Call OpenAI API
 export const callOpenAIAction = async (formData: FormData) => {
   const query = formData.get("query")?.toString();
 
@@ -141,12 +140,12 @@ export const callOpenAIAction = async (formData: FormData) => {
   }
 
   try {
-    const completionConfig: CreateCompletionRequest = {
+    const completionConfig = {
       model: 'gpt-4',
       prompt: query,
       max_tokens: 256,
       temperature: 0,
-      stream: false, // stream can be true if you want streamed responses
+      stream: false,
     };
 
     const response = await fetch('https://api.openai.com/v1/completions', {
