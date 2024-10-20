@@ -4,8 +4,7 @@ import { encodedRedirect } from "@/utils/utils";
 import { createClient } from "@/utils/supabase/server";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
-import 'https://deno.land/x/xhr@0.3.0/mod.ts';
-import { CreateCompletionRequest } from 'https://esm.sh/openai@3.1.0';
+
 
 export const signUpAction = async (formData: FormData) => {
   const email = formData.get("email")?.toString();
