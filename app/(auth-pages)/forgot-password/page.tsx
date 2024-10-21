@@ -4,10 +4,10 @@ import { SubmitButton } from "@/components/submit-button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
-export default async function ResetPassword({
+export default function ResetPassword({
   searchParams,
 }: {
-  searchParams: Message;
+  searchParams?: Record<string, string | string[]>;
 }) {
   return (
     <form className="flex flex-col w-full max-w-md p-4 gap-2 [&>input]:mb-4">
@@ -32,7 +32,9 @@ export default async function ResetPassword({
       <SubmitButton formAction={resetPasswordAction}>
         Reset password
       </SubmitButton>
-      <FormMessage message={searchParams} />
+      {searchParams?.message && (
+        <FormMessage message={{ success: searchParams.message as string }} />
+      )}
     </form>
   );
 }
