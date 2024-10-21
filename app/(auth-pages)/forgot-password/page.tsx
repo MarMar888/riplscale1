@@ -1,16 +1,16 @@
+"use client";
+
+import { useSearchParams } from "next/navigation";
 import { resetPasswordAction } from "@/app/actions";
 import { FormMessage, Message } from "@/components/form-message";
 import { SubmitButton } from "@/components/submit-button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
-export default function ResetPassword({
-  searchParams,
-}: {
-  searchParams: URLSearchParams;
-}) {
+export default function ResetPassword() {
+  const searchParams = useSearchParams();
   const message: Message = {
-    success: searchParams.get('success') || ''
+    success: searchParams.get("success") || "",
   };
 
   return (
@@ -33,9 +33,7 @@ export default function ResetPassword({
         placeholder="Confirm password"
         required
       />
-      <SubmitButton formAction={resetPasswordAction}>
-        Reset password
-      </SubmitButton>
+      <SubmitButton formAction={resetPasswordAction}>Reset password</SubmitButton>
       <FormMessage message={message} />
     </form>
   );
