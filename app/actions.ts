@@ -141,7 +141,7 @@ export const callOpenAIAction = async (formData: FormData): Promise<{ success: b
   const prompt = `Class Name: ${className}, Grade Level: ${gradeLevel}, Objective: ${clos}`;
 
   const completionConfig = {
-    model: 'gpt-4',
+    model: 'gpt-4o',
     prompt: prompt, // Use the constructed prompt from the form data
     max_tokens: 256,
     temperature: 0,
