@@ -7,8 +7,12 @@ import { Label } from "@/components/ui/label";
 export default function ResetPassword({
   searchParams,
 }: {
-  searchParams?: Record<string, string | string[]>;
+  searchParams: URLSearchParams;
 }) {
+  const message: Message = {
+    success: searchParams.get('success') || ''
+  };
+
   return (
     <form className="flex flex-col w-full max-w-md p-4 gap-2 [&>input]:mb-4">
       <h1 className="text-2xl font-medium">Reset password</h1>
@@ -32,9 +36,7 @@ export default function ResetPassword({
       <SubmitButton formAction={resetPasswordAction}>
         Reset password
       </SubmitButton>
-      {searchParams?.message && (
-        <FormMessage message={{ success: searchParams.message as string }} />
-      )}
+      <FormMessage message={message} />
     </form>
   );
 }
