@@ -91,7 +91,7 @@ export default function ProtectedPage() {
         </form>
 
         {/* Display project creation results */}
-        {projectCreationResults.length > 0 && (
+        {projectCreationResults && projectCreationResults.length > 0 && (
           <div className="mt-8 space-y-4">
             {projectCreationResults.map((result, index) => (
               <div key={index} className={`p-4 border rounded ${result.success ? "bg-green-100" : "bg-red-100"}`}>
