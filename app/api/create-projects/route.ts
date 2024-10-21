@@ -67,6 +67,7 @@ export async function POST(request: NextRequest) {
         console.log('OpenAI Result:', openAIResult);
 
         if (openAIResult.success) {
+            console.log(openAIResult.data);
             // Save project details to Supabase
             const { error: projectError } = await supabase
                 .from('projects')
