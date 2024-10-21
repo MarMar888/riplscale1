@@ -16,7 +16,7 @@ export async function POST(request: NextRequest) {
         .from('students')
         .select('*')
         .eq('class_name', className);
-
+    console.log("hello")
     if (fetchError || !students) {
         return NextResponse.json({ error: 'Failed to fetch students' }, { status: 400 });
     }
