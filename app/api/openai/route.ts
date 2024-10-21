@@ -1,8 +1,6 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@/utils/supabase/server';
 import { callOpenAIAction } from '@/app/actions';
-import { generatePDF } from '@/utils/pdf-utils'; // A utility to generate PDFs
-import { sendEmailWithAttachment } from '@/utils/email-utils'; // Utility to send email
 import type { NextRequest } from 'next/server';
 
 export async function POST(request: NextRequest) {
@@ -39,11 +37,7 @@ export async function POST(request: NextRequest) {
                 .insert([{ student_id: student.id, project_details: openAIResult.data }]);
 
             if (!projectError) {
-                // Generate PDF and send email to student
-                const pdf = await generatePDF(openAIResult.data);
-                await sendEmailWithAttachment(student.email, 'Your New Project', pdf);
-
-                projectCreationResults.push({ student: student.name, success: true });
+                projectCreationResults.push({ student: student.name, success: true, project: openAIResult.data });
             } else {
                 projectCreationResults.push({ student: student.name, success: false, error: 'Project save error' });
             }
