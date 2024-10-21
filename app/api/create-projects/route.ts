@@ -70,7 +70,7 @@ export async function POST(request: NextRequest) {
             // Save project details to Supabase
             const { error: projectError } = await supabase
                 .from('projects')
-                .insert([{ student_id: student.id, project_details: openAIResult.data }]);
+                .insert([{ student_id: student.id, details: openAIResult.data }]);
 
             if (projectError) {
                 console.error("Failed to save project:", projectError.message);
