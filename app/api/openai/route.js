@@ -1,4 +1,4 @@
-// app/api/openai/route.js (or route.ts if you're using TypeScript)
+// app/api/openai/route.js (or route.ts if you're using TypeScript) // come on now
 
 import { NextResponse } from "next/server"; // Use this for the app directory structure
 import { callOpenAIAction } from "@/app/actions"; // Ensure this import is correct
