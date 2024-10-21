@@ -9,7 +9,7 @@ import { SmtpMessage } from "../smtp-message";
 export default function ForgotPassword({
   searchParams,
 }: {
-  searchParams: Message;
+  searchParams?: Record<string, string>;
 }) {
   return (
     <>
@@ -29,7 +29,7 @@ export default function ForgotPassword({
           <SubmitButton formAction={forgotPasswordAction}>
             Reset Password
           </SubmitButton>
-          <FormMessage message={searchParams} />
+          {searchParams && <FormMessage message={searchParams as Message} />}
         </div>
       </form>
       <SmtpMessage />
