@@ -28,7 +28,10 @@ export async function POST(request: NextRequest) {
         const prompt = `Create a personalized project for ${student.name}, a ${gradeLevel} student in ${className}, focusing on ${clos}.`;
 
         // Call OpenAI API to generate project details
-        const openAIResult = await callOpenAIAction(new FormData([['prompt', prompt]]));
+        const formData = new FormData();
+        formData.append('prompt', prompt);
+
+        const openAIResult = await callOpenAIAction(formData);
 
         if (openAIResult.success) {
             // Save project details to Supabase
