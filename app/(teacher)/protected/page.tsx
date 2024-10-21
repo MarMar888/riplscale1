@@ -14,6 +14,7 @@ export default function ProtectedPage() {
   // Fetch existing projects when the page loads
   useEffect(() => {
     const fetchProjects = async () => {
+      console.log("Fetched projects:", projects);
       setFetchingProjects(true);
       try {
         const supabase = createClient();
@@ -46,8 +47,14 @@ export default function ProtectedPage() {
         method: "POST",
         body: formData,
       });
+      
 
       const result = await response.json();
+
+
+      console.log("Response status:", response.status);
+      console.log("API result:", result);
+
 
       if (result.success) {
         setProjectCreationResults(result.results);

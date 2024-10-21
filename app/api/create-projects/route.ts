@@ -8,6 +8,8 @@ export async function POST(request: NextRequest) {
     const className = formData.get('ClassName') as string;
     const gradeLevel = formData.get('GradeLevel') as string;
     const clos = formData.get('clos') as string;
+    console.log("ClassName:", className, "GradeLevel:", gradeLevel, "clos:", clos);
+
 
     if (!className || !gradeLevel || !clos) {
         return NextResponse.json({ error: 'All fields are required.' }, { status: 400 });
