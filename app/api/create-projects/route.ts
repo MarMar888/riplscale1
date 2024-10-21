@@ -50,11 +50,13 @@ export async function POST(request: NextRequest) {
         return NextResponse.json({ error: 'Failed to fetch students or no students found' }, { status: 400 });
     }
 
+    console.log(students)
+    console.log(classroom)
     // Iterate through students and generate projects for each
     const projectCreationResults = [];
 
     for (const student of students) {
-        const prompt = `Create a personalized project for ${student.name}, a ${gradeLevel} student in ${className}, focusing on ${clos}.`;
+        const prompt = `Create a personalized project for ${student.name}, who has ${student.interests}, a ${gradeLevel} student in ${className}, focusing on ${clos}.`;
 
         // Call OpenAI API to generate project details
         const promptFormData = new FormData();
