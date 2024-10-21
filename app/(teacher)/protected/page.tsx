@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { createClient } from "@/utils/supabase/server";
+import { createClient } from "@/utils/supabase/client"; // Updated to use client-side Supabase
 import { useRouter } from "next/navigation";
 
 export default function ProtectedPage() {
@@ -75,7 +75,7 @@ export default function ProtectedPage() {
 
           <div className="space-y-2">
             <label htmlFor="GradeLevel">Grade Level</label>
-            <input name="GradeLevel" placeholder="12th Grade" required />
+             <input name="GradeLevel" placeholder="12th Grade" required />
           </div>
 
           <div className="space-y-2">
