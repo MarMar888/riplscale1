@@ -132,30 +132,30 @@ export const signOutAction = async () => {
 
 
 export const callOpenAIAction = async (formData: FormData): Promise<{ success: boolean; data?: string; error?: string }> => {
-  // Access the specific fields from the formData object
-  const className = formData.get("ClassName") as string; // Type assertion to string
+  const className = formData.get("ClassName") as string;
   const gradeLevel = formData.get("GradeLevel") as string;
   const clos = formData.get("clos") as string;
 
-  // Create the OpenAI API request configuration
   const prompt = `Class Name: ${className}, Grade Level: ${gradeLevel}, Objective: ${clos}`;
 
-  const completionConfig = {
-    model: 'gpt-4o',
-    prompt: prompt, // Use the constructed prompt from the form data
+  const requestConfig = {
+    model: 'gpt-4', // Use 'gpt-3.5-turbo' or 'gpt-4'
+    messages: [
+      { role: 'system', content: 'You are a helpful assistant.' },
+      { role: 'user', content: prompt },
+    ],
     max_tokens: 256,
     temperature: 0,
-    stream: false,
   };
 
   try {
-    const response = await fetch('https://api.openai.com/v1/completions', {
+    const response = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
       headers: {
         Authorization: `Bearer ${process.env.OPENAI_API_KEY}`,
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify(completionConfig),
+      body: JSON.stringify(requestConfig),
     });
 
     const result = await response.json();
@@ -163,13 +163,13 @@ export const callOpenAIAction = async (formData: FormData): Promise<{ success: b
     if (response.ok) {
       return {
         success: true,
-        data: result.choices?.[0]?.text ?? "No response",
+        data: result.choices?.[0]?.message?.content ?? "No response",
       };
     } else {
       console.error("Error calling OpenAI API", result);
       return {
         success: false,
-        error: result.message || "OpenAI error occurred.",
+        error: result.error.message || "OpenAI error occurred.",
       };
     }
   } catch (error) {
@@ -180,3 +180,5 @@ export const callOpenAIAction = async (formData: FormData): Promise<{ success: b
     };
   }
 };
+
+
