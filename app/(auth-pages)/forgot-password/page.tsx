@@ -9,9 +9,7 @@ import { Label } from "@/components/ui/label";
 
 export default function ResetPassword() {
   const searchParams = useSearchParams();
-  const message: Message = {
-    success: searchParams.get("success") || "",
-  };
+  const successMessage = searchParams.get("success");
 
   return (
     <form className="flex flex-col w-full max-w-md p-4 gap-2 [&>input]:mb-4">
@@ -36,7 +34,9 @@ export default function ResetPassword() {
       <SubmitButton formAction={resetPasswordAction}>
         Reset password
       </SubmitButton>
-      {message.success && <FormMessage message={message} />}
+      {successMessage && (
+        <FormMessage message={{ success: successMessage }} />
+      )}
     </form>
   );
 }
