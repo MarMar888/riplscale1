@@ -117,7 +117,7 @@ export default function ProtectedPage() {
             {projects.map((project) => (
               <div key={project.id} className="card p-4 border rounded shadow bg-white">
                 <h2 className="text-xl font-semibold">{project.students?.name}</h2>
-                <p className="mt-2 text-sm">{project.project_details}</p>
+                <p className="mt-2 text-sm">{project.details}</p>
               </div>
             ))}
           </div>
