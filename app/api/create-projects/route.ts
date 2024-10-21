@@ -15,14 +15,39 @@ export async function POST(request: NextRequest) {
         return NextResponse.json({ error: 'All fields are required.' }, { status: 400 });
     }
 
-    // Fetch students in the relevant class from Supabase
+    // Fetch the teacher ID from the auth context
+    const {
+        data: { session },
+        error: sessionError,
+    } = await supabase.auth.getSession();
+
+    if (sessionError || !session?.user?.id) {
+        return NextResponse.json({ error: 'Authentication required' }, { status: 401 });
+    }
+
+    const teacherId = session.user.id;
+
+    // Fetch classroom details for the teacher
+    const { data: classroom, error: classroomError } = await supabase
+        .from('classrooms')
+        .select('id')
+        .eq('teacher_id', teacherId)
+        .single();
+
+    if (classroomError || !classroom) {
+        return NextResponse.json({ error: 'Failed to fetch classroom for teacher' }, { status: 400 });
+    }
+
+    const classroomId = classroom.id;
+
+    // Fetch students in the relevant classroom from Supabase
     const { data: students, error: fetchError } = await supabase
         .from('students')
         .select('*')
-        .eq('class_name', className);
+        .eq('classroom_id', classroomId);
 
-    if (fetchError || !students) {
-        return NextResponse.json({ error: 'Failed to fetch students' }, { status: 400 });
+    if (fetchError || !students || students.length === 0) {
+        return NextResponse.json({ error: 'Failed to fetch students or no students found' }, { status: 400 });
     }
 
     // Iterate through students and generate projects for each
@@ -41,16 +66,18 @@ export async function POST(request: NextRequest) {
 
         if (openAIResult.success) {
             // Save project details to Supabase
-            const { data: projectData, error: projectError } = await supabase
+            const { error: projectError } = await supabase
                 .from('projects')
                 .insert([{ student_id: student.id, project_details: openAIResult.data }]);
 
-            if (!projectError) {
-                projectCreationResults.push({ student: student.name, success: true, project: openAIResult.data });
-            } else {
+            if (projectError) {
+                console.error("Failed to save project:", projectError.message);
                 projectCreationResults.push({ student: student.name, success: false, error: 'Project save error' });
+            } else {
+                projectCreationResults.push({ student: student.name, success: true, project: openAIResult.data });
             }
         } else {
+            console.error("OpenAI error:", openAIResult.error);
             projectCreationResults.push({ student: student.name, success: false, error: openAIResult.error });
         }
     }
