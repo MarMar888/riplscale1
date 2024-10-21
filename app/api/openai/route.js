@@ -1,17 +1,55 @@
-// app/api/openai/route.js (or route.ts if you're using TypeScript) // come on now
+import { NextResponse } from 'next/server';
+import { createClient } from '@/utils/supabase/server';
+import { callOpenAIAction } from '@/app/actions';
+import { generatePDF } from '@/utils/pdf-utils'; // A utility to generate PDFs
+import { sendEmailWithAttachment } from '@/utils/email-utils'; // Utility to send email
 
-import { NextResponse } from "next/server"; // Use this for the app directory structure
-import { callOpenAIAction } from "@/app/actions"; // Ensure this import is correct
+export async function POST(request: Request) {
+    const supabase = createClient();
+    const formData = await request.formData();
 
-export async function POST(request) {
-    const formData = await request.formData(); // Extract form data from the request
+    const className = formData.get('ClassName') as string;
+    const gradeLevel = formData.get('GradeLevel') as string;
+    const clos = formData.get('clos') as string;
 
-    // Call your OpenAI action
-    const result = await callOpenAIAction(formData);
+    // Fetch students in the relevant class from Supabase
+    const { data: students, error: fetchError } = await supabase
+        .from('students')
+        .select('*')
+        .eq('class_name', className);
 
-    if (result.success) {
-        return NextResponse.json(result); // Return the successful result
-    } else {
-        return NextResponse.json({ error: result.error || "An error occurred" }, { status: 400 });
+    if (fetchError || !students) {
+        return NextResponse.json({ error: 'Failed to fetch students' }, { status: 400 });
     }
+
+    // Iterate through students and generate projects for each
+    const projectCreationResults = [];
+
+    for (const student of students) {
+        const prompt = `Create a personalized project for ${student.name}, a ${gradeLevel} student in ${className}, focusing on ${clos}.`;
+
+        // Call OpenAI API to generate project details
+        const openAIResult = await callOpenAIAction(new FormData([['prompt', prompt]]));
+
+        if (openAIResult.success) {
+            // Save project details to Supabase
+            const { data: projectData, error: projectError } = await supabase
+                .from('projects')
+                .insert([{ student_id: student.id, project_details: openAIResult.data }]);
+
+            if (!projectError) {
+                // Generate PDF and send email to student
+                const pdf = await generatePDF(openAIResult.data);
+                await sendEmailWithAttachment(student.email, 'Your New Project', pdf);
+
+                projectCreationResults.push({ student: student.name, success: true });
+            } else {
+                projectCreationResults.push({ student: student.name, success: false, error: 'Project save error' });
+            }
+        } else {
+            projectCreationResults.push({ student: student.name, success: false, error: openAIResult.error });
+        }
+    }
+
+    return NextResponse.json({ success: true, results: projectCreationResults });
 }

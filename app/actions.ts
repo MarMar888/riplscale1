@@ -9,14 +9,16 @@ import { redirect } from "next/navigation";
 export const signUpAction = async (formData: FormData) => {
   const email = formData.get("email")?.toString();
   const password = formData.get("password")?.toString();
+  const classroomName = formData.get("classroom_name")?.toString();
+
   const supabase = createClient();
   const origin = headers().get("origin");
 
-  if (!email || !password) {
-    return { error: "Email and password are required" };
+  if (!email || !password || !classroomName) {
+    return { error: "Email, password, and classroom name are required" };
   }
 
-  const { error } = await supabase.auth.signUp({
+  const { data, error } = await supabase.auth.signUp({
     email,
     password,
     options: {
@@ -27,14 +29,28 @@ export const signUpAction = async (formData: FormData) => {
   if (error) {
     console.error(error.code + " " + error.message);
     return encodedRedirect("error", "/sign-up", error.message);
-  } else {
-    return encodedRedirect(
-      "success",
-      "/sign-up",
-      "Thanks for signing up! Please check your email for a verification link.",
-    );
   }
+
+  if (data?.user) {
+    // Add the teacher to the Classrooms table
+    const { error: classroomError } = await supabase.from("Classrooms").insert([
+      { name: classroomName, teacher_id: data.user.id }
+    ]);
+
+    if (classroomError) {
+      console.error("Error creating classroom:", classroomError.message);
+      return encodedRedirect("error", "/sign-up", classroomError.message);
+    }
+  }
+
+  return encodedRedirect(
+    "success",
+    "/sign-up",
+    "Thanks for signing up! Please check your email for a verification link.",
+  );
 };
+
+
 
 export const signInAction = async (formData: FormData) => {
   const email = formData.get("email") as string;
