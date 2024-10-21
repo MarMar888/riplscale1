@@ -3,8 +3,9 @@ import { createClient } from '@/utils/supabase/server';
 import { callOpenAIAction } from '@/app/actions';
 import { generatePDF } from '@/utils/pdf-utils'; // A utility to generate PDFs
 import { sendEmailWithAttachment } from '@/utils/email-utils'; // Utility to send email
+import type { NextRequest } from 'next/server';
 
-export async function POST(request: Request) {
+export async function POST(request: NextRequest) {
     const supabase = createClient();
     const formData = await request.formData();
 
