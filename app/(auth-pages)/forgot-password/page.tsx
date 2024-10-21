@@ -33,8 +33,10 @@ export default function ResetPassword() {
         placeholder="Confirm password"
         required
       />
-      <SubmitButton formAction={resetPasswordAction}>Reset password</SubmitButton>
-      <FormMessage message={message} />
+      <SubmitButton formAction={resetPasswordAction}>
+        Reset password
+      </SubmitButton>
+      {message.success && <FormMessage message={message} />}
     </form>
   );
 }
