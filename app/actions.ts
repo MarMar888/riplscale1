@@ -10,9 +10,8 @@ export const signUpAction = async (formData: FormData) => {
   const password = formData.get("password")?.toString();
   const classroomName = formData.get("classroom_name")?.toString();
 
-  const supabase = createClient();
+  const supabase = await createClient(); // Await the createClient() function
 
-  // Await the headers
   const headersList = await headers();
   const origin = headersList.get("origin");
 
@@ -55,7 +54,7 @@ export const signUpAction = async (formData: FormData) => {
 export const signInAction = async (formData: FormData) => {
   const email = formData.get("email")?.toString();
   const password = formData.get("password")?.toString();
-  const supabase = createClient();
+  const supabase = await createClient(); // Await createClient()
 
   if (!email || !password) {
     return encodedRedirect("error", "/sign-in", "Email and password are required");
@@ -75,9 +74,8 @@ export const signInAction = async (formData: FormData) => {
 
 export const forgotPasswordAction = async (formData: FormData) => {
   const email = formData.get("email")?.toString();
-  const supabase = createClient();
+  const supabase = await createClient(); // Await createClient()
 
-  // Await the headers
   const headersList = await headers();
   const origin = headersList.get("origin");
 
@@ -108,7 +106,7 @@ export const forgotPasswordAction = async (formData: FormData) => {
 };
 
 export const resetPasswordAction = async (formData: FormData) => {
-  const supabase = createClient();
+  const supabase = await createClient(); // Await createClient()
 
   const password = formData.get("password")?.toString();
   const confirmPassword = formData.get("confirmPassword")?.toString();
@@ -141,7 +139,7 @@ export const resetPasswordAction = async (formData: FormData) => {
 };
 
 export const signOutAction = async () => {
-  const supabase = createClient();
+  const supabase = await createClient(); // Await createClient()
   await supabase.auth.signOut();
   return redirect("/sign-in");
 };
