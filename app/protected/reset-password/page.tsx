@@ -1,4 +1,6 @@
 "use client";
+// At the top of your page component
+export const dynamic = 'force-dynamic';
 
 import { resetPasswordAction } from "@/app/actions";
 import { FormMessage } from "@/components/form-message";
