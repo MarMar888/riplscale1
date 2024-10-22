@@ -7,7 +7,6 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useSearchParams } from "next/navigation";
 
-
 export default function ResetPassword() {
   const searchParams = useSearchParams();
   const successMessage = searchParams.get("success");
@@ -35,9 +34,7 @@ export default function ResetPassword() {
       <SubmitButton formAction={resetPasswordAction}>
         Reset password
       </SubmitButton>
-      {successMessage && (
-        <FormMessage message={successMessage} />
-      )}
+      {successMessage && <FormMessage message={{ success: successMessage }} />}
     </form>
   );
 }

@@ -16,7 +16,7 @@ export default function Signup() {
   return (
     <div className="w-full flex-1 flex items-center h-screen justify-center p-4">
       {message ? (
-        <FormMessage message={message} />
+        <FormMessage message={{ success: message }} />
       ) : (
         <form className="flex flex-col min-w-64 max-w-64 mx-auto gap-4">
           <h1 className="text-2xl font-medium">Sign up</h1>
@@ -55,7 +55,7 @@ export default function Signup() {
               Sign up
             </SubmitButton>
           </div>
-          {message && <FormMessage message={message} />}
+          {message && <FormMessage message={{ success: message }} />}
         </form>
       )}
       <SmtpMessage />
