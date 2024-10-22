@@ -5,14 +5,15 @@ import { createClient } from "@/utils/supabase/server";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 
-
 export const signUpAction = async (formData: FormData) => {
   const email = formData.get("email")?.toString();
   const password = formData.get("password")?.toString();
   const classroomName = formData.get("classroom_name")?.toString();
 
-  const supabase = createClient();
-  const origin = headers().get("origin");
+  // Await createClient() if it returns a Promise
+  const supabase = await createClient();
+  const headersList = await headers(); // Await the headers() function
+  const origin = headersList.get("origin");
 
   if (!email || !password || !classroomName) {
     return { error: "Email, password, and classroom name are required" };
@@ -27,15 +28,15 @@ export const signUpAction = async (formData: FormData) => {
   });
 
   if (error) {
-    console.error(error.code + " " + error.message);
+    console.error(`${error.code} ${error.message}`);
     return encodedRedirect("error", "/sign-up", error.message);
   }
 
   if (data?.user) {
     // Add the teacher to the Classrooms table
-    const { error: classroomError } = await supabase.from("Classrooms").insert([
-      { name: classroomName, teacher_id: data.user.id }
-    ]);
+    const { error: classroomError } = await supabase
+      .from("Classrooms")
+      .insert([{ name: classroomName, teacher_id: data.user.id }]);
 
     if (classroomError) {
       console.error("Error creating classroom:", classroomError.message);
@@ -46,16 +47,14 @@ export const signUpAction = async (formData: FormData) => {
   return encodedRedirect(
     "success",
     "/sign-up",
-    "Thanks for signing up! Please check your email for a verification link.",
+    "Thanks for signing up! Please check your email for a verification link."
   );
 };
-
-
 
 export const signInAction = async (formData: FormData) => {
   const email = formData.get("email") as string;
   const password = formData.get("password") as string;
-  const supabase = createClient();
+  const supabase = await createClient();
 
   const { error } = await supabase.auth.signInWithPassword({
     email,
@@ -71,8 +70,9 @@ export const signInAction = async (formData: FormData) => {
 
 export const forgotPasswordAction = async (formData: FormData) => {
   const email = formData.get("email")?.toString();
-  const supabase = createClient();
-  const origin = headers().get("origin");
+  const supabase = await createClient();
+  const headersList = await headers(); // Await the headers() function
+  const origin = headersList.get("origin");
   const callbackUrl = formData.get("callbackUrl")?.toString();
 
   if (!email) {
@@ -85,11 +85,7 @@ export const forgotPasswordAction = async (formData: FormData) => {
 
   if (error) {
     console.error(error.message);
-    return encodedRedirect(
-      "error",
-      "/forgot-password",
-      "Could not reset password",
-    );
+    return encodedRedirect("error", "/forgot-password", "Could not reset password");
   }
 
   if (callbackUrl) {
@@ -99,30 +95,26 @@ export const forgotPasswordAction = async (formData: FormData) => {
   return encodedRedirect(
     "success",
     "/forgot-password",
-    "Check your email for a link to reset your password.",
+    "Check your email for a link to reset your password."
   );
 };
 
 export const resetPasswordAction = async (formData: FormData) => {
-  const supabase = createClient();
+  const supabase = await createClient();
 
   const password = formData.get("password") as string;
   const confirmPassword = formData.get("confirmPassword") as string;
 
   if (!password || !confirmPassword) {
-    encodedRedirect(
+    return encodedRedirect(
       "error",
       "/protected/reset-password",
-      "Password and confirm password are required",
+      "Password and confirm password are required"
     );
   }
 
   if (password !== confirmPassword) {
-    encodedRedirect(
-      "error",
-      "/protected/reset-password",
-      "Passwords do not match",
-    );
+    return encodedRedirect("error", "/protected/reset-password", "Passwords do not match");
   }
 
   const { error } = await supabase.auth.updateUser({
@@ -130,24 +122,21 @@ export const resetPasswordAction = async (formData: FormData) => {
   });
 
   if (error) {
-    encodedRedirect(
-      "error",
-      "/protected/reset-password",
-      "Password update failed",
-    );
+    return encodedRedirect("error", "/protected/reset-password", "Password update failed");
   }
 
-  encodedRedirect("success", "/protected/reset-password", "Password updated");
+  return encodedRedirect("success", "/protected/reset-password", "Password updated");
 };
 
 export const signOutAction = async () => {
-  const supabase = createClient();
+  const supabase = await createClient();
   await supabase.auth.signOut();
   return redirect("/sign-in");
 };
 
-
-export const callOpenAIAction = async (formData: FormData): Promise<{ success: boolean; data?: string; error?: string }> => {
+export const callOpenAIAction = async (
+  formData: FormData
+): Promise<{ success: boolean; data?: string; error?: string }> => {
   const className = formData.get("ClassName") as string;
   const gradeLevel = formData.get("GradeLevel") as string;
   const clos = formData.get("clos") as string;
@@ -155,21 +144,21 @@ export const callOpenAIAction = async (formData: FormData): Promise<{ success: b
   const prompt = `Class Name: ${className}, Grade Level: ${gradeLevel}, Objective: ${clos}`;
 
   const requestConfig = {
-    model: 'gpt-4', // Use 'gpt-3.5-turbo' or 'gpt-4'
+    model: "gpt-4", // Use 'gpt-3.5-turbo' or 'gpt-4'
     messages: [
-      { role: 'system', content: 'You are a helpful assistant.' },
-      { role: 'user', content: prompt },
+      { role: "system", content: "You are a helpful assistant." },
+      { role: "user", content: prompt },
     ],
     max_tokens: 256,
     temperature: 0,
   };
 
   try {
-    const response = await fetch('https://api.openai.com/v1/chat/completions', {
-      method: 'POST',
+    const response = await fetch("https://api.openai.com/v1/chat/completions", {
+      method: "POST",
       headers: {
         Authorization: `Bearer ${process.env.OPENAI_API_KEY}`,
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
       },
       body: JSON.stringify(requestConfig),
     });
@@ -185,7 +174,7 @@ export const callOpenAIAction = async (formData: FormData): Promise<{ success: b
       console.error("Error calling OpenAI API", result);
       return {
         success: false,
-        error: result.error.message || "OpenAI error occurred.",
+        error: result.error?.message || "OpenAI error occurred.",
       };
     }
   } catch (error) {
@@ -196,5 +185,3 @@ export const callOpenAIAction = async (formData: FormData): Promise<{ success: b
     };
   }
 };
-
-
