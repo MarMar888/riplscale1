@@ -6,13 +6,43 @@ import { Label } from "@/components/ui/label";
 import Link from "next/link";
 import { SmtpMessage } from "../smtp-message";
 
-export default function Signup({ searchParams }: { searchParams: Message }) {
-  if ("message" in searchParams) {
+export default async function Signup({
+  searchParams,
+}: {
+  searchParams: Promise<Record<string, string | string[]>>;
+}) {
+  // Await the searchParams since it's now a Promise
+  const params = await searchParams;
+
+  let messageToShow: Message | null = null;
+
+  // Check for 'message' in the parameters
+  const message = params.message;
+
+  if (message !== undefined) {
+    messageToShow = {
+      message: Array.isArray(message) ? message[0] : message,
+    };
+
     return (
       <div className="w-full flex-1 flex items-center h-screen sm:max-w-md justify-center gap-2 p-4">
-        <FormMessage message={searchParams} />
+        <FormMessage message={messageToShow} />
       </div>
     );
+  }
+
+  // Extract success and error messages
+  const successMessage = params.success;
+  const errorMessage = params.error;
+
+  if (successMessage !== undefined) {
+    messageToShow = {
+      success: Array.isArray(successMessage) ? successMessage[0] : successMessage,
+    };
+  } else if (errorMessage !== undefined) {
+    messageToShow = {
+      error: Array.isArray(errorMessage) ? errorMessage[0] : errorMessage,
+    };
   }
 
   return (
@@ -48,7 +78,7 @@ export default function Signup({ searchParams }: { searchParams: Message }) {
           <SubmitButton formAction={signUpAction} pendingText="Signing up...">
             Sign up
           </SubmitButton>
-          <FormMessage message={searchParams} />
+          {messageToShow && <FormMessage message={messageToShow} />}
         </div>
       </form>
       <SmtpMessage />
