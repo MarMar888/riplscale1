@@ -6,10 +6,6 @@ import { Button } from "./ui/button";
 import { createClient } from "@/utils/supabase/server";
 
 export default async function AuthButton() {
-  const {
-    data: { user },
-  } = await createClient().auth.getUser();
-
   if (!hasEnvVars) {
     return (
       <>
@@ -46,6 +42,19 @@ export default async function AuthButton() {
       </>
     );
   }
+
+  // Await the createClient() function to get the Supabase client
+  const supabase = await createClient();
+  const {
+    data: { user },
+    error,
+  } = await supabase.auth.getUser();
+
+  if (error) {
+    console.error("Error fetching user:", error.message);
+    return null;
+  }
+
   return user ? (
     <div className="flex items-center gap-4">
       Hey, {user.email}!
