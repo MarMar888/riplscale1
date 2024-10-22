@@ -10,8 +10,8 @@ import Link from "next/link";
 
 export default function Login() {
   const searchParams = useSearchParams();
-  const successMessage = searchParams.get("success");
-  const errorMessage = searchParams.get("error");
+  const successMessage = searchParams.get("success") || undefined;
+  const errorMessage = searchParams.get("error") || undefined;
 
   return (
     <form className="flex-1 flex flex-col min-w-64">
