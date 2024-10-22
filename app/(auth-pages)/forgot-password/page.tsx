@@ -1,7 +1,7 @@
 "use client";
 
 import { forgotPasswordAction } from "@/app/actions";
-import { FormMessage } from "@/components/form-message";
+import { FormMessage, Message } from "@/components/form-message";
 import { SubmitButton } from "@/components/submit-button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -12,6 +12,15 @@ import { useSearchParams } from "next/navigation";
 export default function ForgotPassword() {
   const searchParams = useSearchParams();
   const successMessage = searchParams.get("success");
+  const errorMessage = searchParams.get("error");
+
+  let messageToShow: Message | null = null;
+
+  if (successMessage !== null) {
+    messageToShow = { success: successMessage };
+  } else if (errorMessage !== null) {
+    messageToShow = { error: errorMessage };
+  }
 
   return (
     <>
@@ -31,7 +40,7 @@ export default function ForgotPassword() {
           <SubmitButton formAction={forgotPasswordAction}>
             Reset Password
           </SubmitButton>
-          {successMessage && <FormMessage message={{ success: successMessage }} />}
+          {messageToShow && <FormMessage message={messageToShow} />}
         </div>
       </form>
       <SmtpMessage />

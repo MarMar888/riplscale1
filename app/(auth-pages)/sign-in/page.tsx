@@ -2,7 +2,7 @@
 
 import { useSearchParams } from "next/navigation";
 import { signInAction } from "@/app/actions";
-import { FormMessage } from "@/components/form-message";
+import { FormMessage, Message } from "@/components/form-message";
 import { SubmitButton } from "@/components/submit-button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -10,8 +10,16 @@ import Link from "next/link";
 
 export default function Login() {
   const searchParams = useSearchParams();
-  const successMessage = searchParams.get("success") || undefined;
-  const errorMessage = searchParams.get("error") || undefined;
+  const successMessage = searchParams.get("success");
+  const errorMessage = searchParams.get("error");
+
+  let messageToShow: Message | null = null;
+
+  if (successMessage !== null) {
+    messageToShow = { success: successMessage };
+  } else if (errorMessage !== null) {
+    messageToShow = { error: errorMessage };
+  }
 
   return (
     <form className="flex-1 flex flex-col min-w-64">
@@ -43,15 +51,7 @@ export default function Login() {
         <SubmitButton pendingText="Signing In..." formAction={signInAction}>
           Sign in
         </SubmitButton>
-        {(successMessage || errorMessage) && (
-          <FormMessage
-            message={
-              successMessage
-                ? { success: successMessage }
-                : { error: errorMessage }
-            }
-          />
-        )}
+        {messageToShow && <FormMessage message={messageToShow} />}
       </div>
     </form>
   );
