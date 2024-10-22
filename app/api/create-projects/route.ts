@@ -4,12 +4,12 @@ import { callOpenAIAction } from '@/app/actions';
 import type { NextRequest } from 'next/server';
 
 export async function POST(request: NextRequest) {
-    const supabase = createClient();
+    const supabase = await createClient(); // Await createClient()
     const formData = await request.formData();
 
-    const className = formData.get('ClassName') as string;
-    const gradeLevel = formData.get('GradeLevel') as string;
-    const clos = formData.get('clos') as string;
+    const className = formData.get('ClassName')?.toString();
+    const gradeLevel = formData.get('GradeLevel')?.toString();
+    const clos = formData.get('clos')?.toString();
 
     if (!className || !gradeLevel || !clos) {
         return NextResponse.json({ error: 'All fields are required.' }, { status: 400 });
@@ -50,8 +50,6 @@ export async function POST(request: NextRequest) {
         return NextResponse.json({ error: 'Failed to fetch students or no students found' }, { status: 400 });
     }
 
-    console.log(students)
-    console.log(classroom)
     // Iterate through students and generate projects for each
     const projectCreationResults = [];
 
@@ -63,11 +61,8 @@ export async function POST(request: NextRequest) {
         promptFormData.append('prompt', prompt);
 
         const openAIResult = await callOpenAIAction(promptFormData);
-        console.log(`Generating project for student: ${student.name}`);
-        console.log('OpenAI Result:', openAIResult);
 
         if (openAIResult.success) {
-            console.log(openAIResult.data);
             // Save project details to Supabase
             const { error: projectError } = await supabase
                 .from('projects')
