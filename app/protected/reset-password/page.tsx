@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useSearchParams } from "next/navigation";
 
+
 export default function ResetPassword() {
   const searchParams = useSearchParams();
   const successMessage = searchParams.get("success");
