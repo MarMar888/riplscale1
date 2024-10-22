@@ -14,15 +14,13 @@ export default function Signup() {
   const message = searchParams.get("message");
 
   return (
-    <>
+    <div className="w-full flex-1 flex items-center h-screen justify-center p-4">
       {message ? (
-        <div className="w-full flex-1 flex items-center h-screen sm:max-w-md justify-center gap-2 p-4">
-          <FormMessage message={{ success: message }} />
-        </div>
+        <FormMessage message={message} />
       ) : (
-        <form className="flex flex-col min-w-64 max-w-64 mx-auto">
+        <form className="flex flex-col min-w-64 max-w-64 mx-auto gap-4">
           <h1 className="text-2xl font-medium">Sign up</h1>
-          <p className="text-sm text text-foreground">
+          <p className="text-sm text-foreground">
             Already have an account?{" "}
             <Link
               className="text-primary font-medium underline"
@@ -31,12 +29,13 @@ export default function Signup() {
               Sign in
             </Link>
           </p>
-          <div className="flex flex-col gap-2 [&>input]:mb-3 mt-8">
+          <div className="flex flex-col gap-2 mt-8">
             <Label htmlFor="email">Email</Label>
-            <Input name="email" placeholder="you@example.com" required />
+            <Input id="email" name="email" placeholder="you@example.com" required />
 
             <Label htmlFor="password">Password</Label>
             <Input
+              id="password"
               type="password"
               name="password"
               placeholder="Your password"
@@ -46,6 +45,7 @@ export default function Signup() {
 
             <Label htmlFor="classroom_name">Classroom Name</Label>
             <Input
+              id="classroom_name"
               name="classroom_name"
               placeholder="Enter your classroom name"
               required
@@ -54,11 +54,11 @@ export default function Signup() {
             <SubmitButton formAction={signUpAction} pendingText="Signing up...">
               Sign up
             </SubmitButton>
-            {message && <FormMessage message={{ success: message }} />}
           </div>
+          {message && <FormMessage message={message} />}
         </form>
       )}
       <SmtpMessage />
-    </>
+    </div>
   );
 }
